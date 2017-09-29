@@ -1,4 +1,7 @@
 # match-observer
+A simple function to implement a comparison between an observable and an array of values.
+
+There is an article on this function and its usage: [Testing observable's values when using Angular fakeAsync](https://medium.com/@akaztp/testing-observables-values-when-using-angular-fakeasync-29151ebe5d0b)
 
 ## Installation
 
@@ -8,7 +11,7 @@ Simply install it from npm using the name `match-observer`.
 
 Import  the module using typescript or require it using plain javascript.
 
-This module exporta only a function to implement a comparison between an observable and an array of values, producing a promise that resolves if there is a match or rejects if not. It has the following signature:
+This module exports only a function to implement a comparison between an observable and an array of values, producing a promise that resolves if there is a match or rejects if not. It has the following signature:
 ```
 function matchObservable<T>(
     obs$: Observable<T>,
