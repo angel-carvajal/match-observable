@@ -3,10 +3,6 @@ A simple function to implement a comparison between an observable and an array o
 
 There is an article on this function and its usage: [Testing observable's values when using Angular fakeAsync](https://medium.com/@akaztp/testing-observables-values-when-using-angular-fakeasync-29151ebe5d0b)
 
-## Installation
-
-Simply install it from npm using the name `match-observer`.
-
 ## Usage
 
 Import  the module using typescript or require it using plain javascript.
