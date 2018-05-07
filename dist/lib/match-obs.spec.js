@@ -44,7 +44,7 @@ describe('matchObservable()', function () {
             .then(done);
         ts.flush();
     });
-    it('match correctly some values and detect uncomplete', function (done) {
+    it('match correctly some values and detect incomplete', function (done) {
         var cold = ts.createColdObservable('123456');
         var expectedValues = ['1', '2', '3', '4', '5'];
         match_obs_1.matchObservable(cold, expectedValues, true, false)
@@ -66,6 +66,23 @@ describe('matchObservable()', function () {
         match_obs_1.matchObservable(cold, expectedValues, false, true)
             .then(function () { fail('Failed detection.'); done(); })
             .catch(done);
+        ts.flush();
+    });
+    it('uses the provided valuePrint function', function (done) {
+        var cold = ts.createColdObservable('12345');
+        var expectedValues = ['1', '2', '3', '4', '6'];
+        match_obs_1.matchObservable(cold, expectedValues, false, false, function (a, b) { return a === b; }, function (v) { return (v + 'P').toString(); })
+            .then(function () {
+            fail('Did not detect unmatched values.');
+            done();
+        })
+            .catch(function (message) {
+            expect(message).toBe('Values at index 4 are expected to match. Received:\n' +
+                '5P\n' +
+                'Expected:\n' +
+                '6P');
+            done();
+        });
         ts.flush();
     });
 });

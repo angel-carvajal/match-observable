@@ -1,6 +1,6 @@
 {
   "name": "match-observable",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "An helper function to assert if an Observer produces the specified values.",
   "main": "dist/index.js",
   "scripts": {

@@ -12,11 +12,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
  *  if this parameter is true. If false, no expectation on complete is made.
  * @param expectError If after the expected values, the observer is expected to error. If false, no expectation on error is made.
  * @param matcher An equality function for matching the observable values with the values array provided.
+ * @param valuePrinter a function to customize the printing of value in messages
  */
-function matchObservable(obs$, values, expectComplete, expectError, matcher) {
+function matchObservable(obs$, values, expectComplete, expectError, matcher, valuePrinter) {
     if (expectComplete === void 0) { expectComplete = true; }
     if (expectError === void 0) { expectError = false; }
     if (matcher === void 0) { matcher = function (a, b) { return a === b; }; }
+    if (valuePrinter === void 0) { valuePrinter = function (v) { return JSON.stringify(v); }; }
     return new Promise(matchObs);
     function matchObs(resolve, reject) {
         var expectedStep = 0;
@@ -27,11 +29,11 @@ function matchObservable(obs$, values, expectComplete, expectError, matcher) {
             if (expectedStep === -1)
                 return;
             if (expectedStep >= values.length)
-                finalize('Too many values on observable: ' + JSON.stringify(value));
+                finalize('Too many values on observable: ' + valuePrinter(value));
             else {
                 if (matcher(value, values[expectedStep]) === false)
-                    finalize('Values are expected to match: ' + JSON.stringify(value)
-                        + ' and ' + JSON.stringify(values[expectedStep]));
+                    finalize("Values at index " + expectedStep + " are expected to match. Received:\n"
+                        + (valuePrinter(value) + "\nExpected:\n" + valuePrinter(values[expectedStep])));
                 else {
                     expectedStep++;
                     if (!expectComplete && !expectError && expectedStep === values.length)
@@ -46,7 +48,7 @@ function matchObservable(obs$, values, expectComplete, expectError, matcher) {
             if (expectError && expectedStep === values.length)
                 finalize();
             else
-                finalize('Observable errored unexpectedly. Error: ' + err.toString());
+                finalize("Observable errored unexpectedly before emission index " + expectedStep + ". Error: " + err.toString());
         }
         function complete() {
             // console.log('Complete. step: ', expectedStep);

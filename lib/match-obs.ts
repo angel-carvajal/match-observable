@@ -13,6 +13,7 @@ import { Subscription } from 'rxjs/Subscription';
  *  if this parameter is true. If false, no expectation on complete is made.
  * @param expectError If after the expected values, the observer is expected to error. If false, no expectation on error is made.
  * @param matcher An equality function for matching the observable values with the values array provided.
+ * @param valuePrinter a function to customize the printing of value in messages
  */
 export function matchObservable<T>(
     obs$: Observable<T>,
@@ -20,6 +21,7 @@ export function matchObservable<T>(
     expectComplete: boolean = true,
     expectError: boolean = false,
     matcher: (actual: T, expected: T) => boolean = (a, b) => a === b,
+    valuePrinter:  (v: T) => string = v => JSON.stringify(v),
 ): Promise<void>
 {
     return new Promise<void>(matchObs);
@@ -37,12 +39,12 @@ export function matchObservable<T>(
                 return;
 
             if (expectedStep >= values.length)
-                finalize('Too many values on observable: ' + JSON.stringify(value));
+                finalize('Too many values on observable: ' + valuePrinter(value));
             else
             {
                 if (matcher(value, values[expectedStep]) === false)
-                    finalize('Values are expected to match: ' + JSON.stringify(value)
-                        + ' and ' + JSON.stringify(values[expectedStep]));
+                    finalize(`Values at index ${expectedStep} are expected to match. Received:\n`
+                        + `${valuePrinter(value)}\nExpected:\n${valuePrinter(values[expectedStep])}`);
                 else
                 {
                     expectedStep++;
@@ -61,7 +63,7 @@ export function matchObservable<T>(
             if (expectError && expectedStep === values.length)
                 finalize();
             else
-                finalize('Observable errored unexpectedly. Error: ' + err.toString());
+                finalize(`Observable errored unexpectedly before emission index ${expectedStep}. Error: ${err.toString()}`);
         }
 
         function complete()

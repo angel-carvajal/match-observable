@@ -1,11 +1,11 @@
-import { TestScheduler } from 'rxjs/testing/TestScheduler';
+import {TestScheduler} from 'rxjs/testing/TestScheduler';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/concat';
 import 'rxjs/add/observable/throw';
 import 'rxjs/add/operator/delay';
 import 'rxjs/add/operator/startWith';
 
-import { matchObservable } from './match-obs';
+import {matchObservable} from './match-obs';
 
 describe('matchObservable()', () =>
 {
@@ -64,7 +64,7 @@ describe('matchObservable()', () =>
         ts.flush();
     });
 
-    it('match correctly some values and detect uncomplete', (done) =>
+    it('match correctly some values and detect incomplete', (done) =>
     {
         const cold = ts.createColdObservable('123456');
         const expectedValues = ['1', '2', '3', '4', '5'];
@@ -100,4 +100,30 @@ describe('matchObservable()', () =>
         ts.flush();
     });
 
+    it('uses the provided valuePrint function', (done) =>
+    {
+        const cold = ts.createColdObservable('12345');
+        const expectedValues = ['1', '2', '3', '4', '6'];
+
+        matchObservable<string>(
+            cold,
+            expectedValues,
+            false,
+            false,
+            (a, b) => a === b,
+            v => (v + 'P').toString())
+            .then(() => {
+                fail('Did not detect unmatched values.');
+                done();
+            })
+            .catch(message => {
+                expect(message).toBe('Values at index 4 are expected to match. Received:\n' +
+                    '5P\n' +
+                    'Expected:\n' +
+                    '6P');
+                done();
+            });
+
+        ts.flush();
+    });
 });

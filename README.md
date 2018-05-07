@@ -15,6 +15,7 @@ function matchObservable<T>(
     expectComplete: boolean = true,
     expectError: boolean = false,
     matcher: (actual: T, expected: T) => boolean = (a, b) => a === b,
+    valuePrinter:  (v: T) => string = v => JSON.stringify(v),
 ): Promise<void>
 ```
 It compares the values the observer produces with the provided array of values. It also checks for the observable completion or error if required.
